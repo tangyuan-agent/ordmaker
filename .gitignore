@@ -1,5 +1,5 @@
 # 🔐 敏感信息 - 绝对不要提交！
-wallet.json
+wallet*.json
 *.wif
 *.key
 *_private*

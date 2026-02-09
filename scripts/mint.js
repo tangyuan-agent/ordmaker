@@ -17,7 +17,7 @@ const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
 const args = process.argv.slice(2);
 const quantity = parseInt(args.find(a => a.startsWith('--quantity='))?.split('=')[1] || '1');
 const feeRate = args.find(a => a.startsWith('--fee-rate='))?.split('=')[1];
-const configFile = args.find(a => a.startsWith('--config='))?.split('=')[1] || 'wallet.json';
+const configFile = args.find(a => a.startsWith('--config='))?.split('=')[1] || '../wallet.json';
 
 console.log('🚀 WhoAmI Ordinals Minting Script');
 console.log('='.repeat(50));
@@ -59,8 +59,9 @@ async function fetchAPI(endpoint, options = {}) {
   });
 
   const data = await response.json();
-
-  if (!response.ok) {
+  
+  // 特殊处理：403 + challenge_required 是正常的第一步响应
+  if (!response.ok && !data.challenge_required) {
     throw new Error(data.error || `HTTP ${response.status}`);
   }
 
