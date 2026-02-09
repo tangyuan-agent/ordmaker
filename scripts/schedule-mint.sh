@@ -64,14 +64,31 @@ while [ $wait_seconds -gt 60 ]; do
     echo "  ⏳ 还剩 ${wait_seconds} 秒..."
 done
 
-# 最后60秒精确倒计时
+# 最后60秒精确倒计时（使用 20ms 精度）
 echo ""
-echo "🔥 进入最后60秒倒计时..."
-for i in $(seq $wait_seconds -1 1); do
-    if [ $i -le 10 ] || [ $((i % 10)) -eq 0 ]; then
-        echo "  $i..."
+echo "🔥 进入最后60秒倒计时（精确模式）..."
+
+# 粗略等待到最后 2 秒
+if [ $wait_seconds -gt 2 ]; then
+    coarse_wait=$((wait_seconds - 2))
+    echo "  粗略等待 $coarse_wait 秒..."
+    sleep $coarse_wait
+    wait_seconds=2
+fi
+
+# 最后 2 秒使用 20ms 精度
+echo "  🎯 精确等待最后 2 秒..."
+remaining_ms=$((wait_seconds * 1000))
+
+while [ $remaining_ms -gt 0 ]; do
+    if [ $remaining_ms -le 1000 ]; then
+        # 最后 1 秒，每 100ms 显示一次
+        if [ $((remaining_ms % 100)) -eq 0 ]; then
+            echo "    ${remaining_ms}ms..."
+        fi
     fi
-    sleep 1
+    sleep 0.02  # 20ms
+    remaining_ms=$((remaining_ms - 20))
 done
 
 echo ""
