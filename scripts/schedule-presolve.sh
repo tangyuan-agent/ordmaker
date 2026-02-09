@@ -57,15 +57,19 @@ function wait_until() {
     if [ $wait_seconds -gt 0 ]; then
         echo "⏳ [$label] 等待 $wait_seconds 秒..."
         
-        # 粗略等待
-        if [ $wait_seconds -gt 2 ]; then
-            coarse_wait=$((wait_seconds - 2))
-            sleep $coarse_wait
-            wait_seconds=2
-        fi
+        # 粗略等待（每次 1 秒）
+        while [ $wait_seconds -gt 2 ]; do
+            sleep 1
+            wait_seconds=$((wait_seconds - 1))
+            # 每 10 秒显示一次进度
+            if [ $((wait_seconds % 10)) -eq 0 ]; then
+                echo "  还剩 $wait_seconds 秒..."
+            fi
+        done
         
-        # 精确等待最后 2 秒
+        # 精确等待最后 2 秒（每次 20ms）
         if [ $wait_seconds -gt 0 ]; then
+            echo "  🎯 精确等待最后 $wait_seconds 秒..."
             remaining_ms=$((wait_seconds * 1000))
             while [ $remaining_ms -gt 0 ]; do
                 sleep 0.02
