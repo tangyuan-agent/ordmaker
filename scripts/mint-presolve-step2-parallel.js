@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Step 2: 读取所有解答，饱和式提交并完成铸造
- * 用法: node mint-presolve-step2.js <solutions_file>
+ * Step 2: 纯并发版本（立即发送100个请求）
+ * 用法: node mint-presolve-step2-parallel.js <solutions_file>
  */
 
 const fs = require('fs');
@@ -17,8 +17,7 @@ const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
 const SUBMIT_TIMEOUT = 5000; // 5秒超时
-const REQUESTS_PER_SOLUTION = 50; // 每个解答发50次
-const INTERVAL_MS = 10; // 每10ms发一次
+const PARALLEL_PER_SOLUTION = 50; // 每个解答发50次（纯并发）
 
 const solutionsFile = process.argv[2] || path.resolve(__dirname, '../whoami-solutions.json');
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));
@@ -77,82 +76,48 @@ function signPSBT(psbtBase64) {
   return psbt.toBase64();
 }
 
-// 饱和式提交（间隔发送）
-async function saturatedSubmit(solutions) {
-  const totalRequests = solutions.length * REQUESTS_PER_SOLUTION;
-  console.log(`📨 饱和式发送: ${solutions.length} 个解答 × ${REQUESTS_PER_SOLUTION} 次 = ${totalRequests} 请求`);
-  console.log(`⏱️  间隔: ${INTERVAL_MS}ms, 持续时间: ${(totalRequests * INTERVAL_MS / 1000).toFixed(1)}秒`);
+// 纯并发提交
+async function parallelSubmit(solutions) {
+  console.log(`🚀 纯并发模式: ${solutions.length} 个解答 × ${PARALLEL_PER_SOLUTION} 次 = ${solutions.length * PARALLEL_PER_SOLUTION} 并发`);
+  console.log('⚠️  警告：瞬间发送所有请求！');
   console.log('');
   
-  const results = [];
-  let successResult = null;
-  let requestCount = 0;
+  const requests = [];
   
-  // 创建请求队列
-  const queue = [];
+  // 创建所有请求（立即发送）
   for (const solution of solutions) {
-    for (let i = 0; i < REQUESTS_PER_SOLUTION; i++) {
-      queue.push({ solution, attempt: i + 1 });
+    for (let i = 0; i < PARALLEL_PER_SOLUTION; i++) {
+      requests.push(
+        apiCall(`/agent/collections/${COLLECTION_ID}/mint`, solution.payload, SUBMIT_TIMEOUT)
+          .then(result => ({ result, solution: solution.label, attempt: i + 1 }))
+          .catch(err => ({ error: err.message, solution: solution.label, attempt: i + 1 }))
+      );
     }
   }
   
-  // 间隔发送
-  const startTime = Date.now();
+  // 等待所有请求完成
+  const results = await Promise.all(requests);
   
-  for (const item of queue) {
-    requestCount++;
-    
-    // 发送请求（不等待）
-    apiCall(`/agent/collections/${COLLECTION_ID}/mint`, item.solution.payload, SUBMIT_TIMEOUT)
-      .then(result => {
-        if (result.commit_psbt && !successResult) {
-          successResult = { result, solution: item.solution.label, attempt: item.attempt };
-          console.log(`\n✅ 第 ${requestCount}/${totalRequests} 个请求成功！(${item.solution.label}#${item.attempt})`);
-        }
-        results.push({ result, solution: item.solution.label, attempt: item.attempt });
-      })
-      .catch(err => {
-        results.push({ error: err.message, solution: item.solution.label, attempt: item.attempt });
-      });
-    
-    // 每10ms发一次
-    if (requestCount < totalRequests) {
-      await new Promise(resolve => setTimeout(resolve, INTERVAL_MS));
-    }
-    
-    // 进度显示（每10个）
-    if (requestCount % 10 === 0) {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-      process.stdout.write(`\r  已发送: ${requestCount}/${totalRequests} (${elapsed}s)`);
-    }
-  }
-  
-  console.log(''); // 换行
-  console.log(`\n⏳ 等待所有请求完成...`);
-  
-  // 等待所有请求完成（最多等5秒）
-  const maxWait = Date.now() + 5000;
-  while (results.length < totalRequests && Date.now() < maxWait) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-  
+  // 统计结果
   const successes = results.filter(r => r.result && r.result.commit_psbt);
   const errors = results.filter(r => r.error);
   
-  console.log(`\n📊 结果: ${successes.length} 成功, ${errors.length} 失败, ${totalRequests - results.length} 未完成`);
+  console.log(`📊 结果: ${successes.length} 成功, ${errors.length} 失败`);
   
   if (successes.length === 0) {
-    console.error('\n失败详情（全部）:');
+    console.error('');
+    console.error('失败详情（全部）:');
     errors.forEach(e => {
       console.error(`  - [${e.solution}#${e.attempt}] ${e.error}`);
     });
     throw new Error('所有请求都失败了');
   }
   
-  console.log(`✅ 使用 ${successResult.solution} 的第 ${successResult.attempt} 次尝试`);
+  const success = successes[0];
+  console.log(`✅ 使用 ${success.solution} 的第 ${success.attempt} 次尝试`);
   console.log('');
   
-  return successResult.result;
+  return success.result;
 }
 
 // 主流程
@@ -176,8 +141,8 @@ async function saturatedSubmit(solutions) {
     });
     console.log('');
     
-    // 饱和式提交
-    const mint = await saturatedSubmit(data.solutions);
+    // 纯并发提交
+    const mint = await parallelSubmit(data.solutions);
     
     if (!mint.commit_psbt) {
       throw new Error('未收到 PSBT');
