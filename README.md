@@ -13,15 +13,13 @@ Bitcoin Ordinals 自动铸造工具 - 支持 PoW 挑战求解和 PSBT 签名
 ## 📦 安装依赖
 
 ```bash
-cd scripts
 npm install
 ```
 
 ## 🔑 配置钱包
 
 ```bash
-cd scripts
-cp wallet.json.example wallet.json
+cp scripts/wallet.json.example wallet.json
 # 编辑 wallet.json，填入你的钱包信息
 ```
 
