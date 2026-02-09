@@ -7,7 +7,7 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/.."
 
-QUANTITY=${1:-4}
+QUANTITY=${1:-3}
 SOLVE_SCRIPT="$SCRIPT_DIR/solve-challenge.js"
 SUBMIT_SCRIPT="$SCRIPT_DIR/submit-presolve.js"
 SOLUTIONS_FILE="$SCRIPT_DIR/../whoami-solutions.json"
@@ -97,16 +97,16 @@ function fetch_and_solve() {
     fi
 }
 
-# Step 1: 17:58:00 获取谜题1
-wait_until "17:58:00" "谜题1"
+# Step 1: 20:58:00 获取谜题1
+wait_until "20:58:00" "谜题1"
 fetch_and_solve "1️⃣ 谜题1"
 
-# Step 2: 17:58:58 获取谜题2
-wait_until "17:58:58" "谜题2"
+# Step 2: 20:58:58 获取谜题2
+wait_until "20:58:58" "谜题2"
 fetch_and_solve "2️⃣ 谜题2"
 
-# Step 3: 18:00:00 饱和式提交
-wait_until "18:00:00" "提交"
+# Step 3: 21:00:00 饱和式提交
+wait_until "21:00:00" "提交"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━"

@@ -12,7 +12,7 @@ const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
 
-const quantity = parseInt(process.argv[2] || '4');
+const quantity = parseInt(process.argv[2] || '3');
 const solutionsFile = process.argv[3] || path.resolve(__dirname, '../whoami-solutions.json');
 const label = process.argv[4] || 'Solution';
 

@@ -16,10 +16,10 @@ const ECPair = ECPairFactory(ecc);
 const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
-const REQUEST_TIMEOUT = 500; // 500ms 快速失败
+const REQUEST_TIMEOUT = 10000; // 10秒超时
 const SUBMIT_RETRIES = 10; // 饱和式发送 10 次
 
-const quantity = parseInt(process.argv[2] || '4');
+const quantity = parseInt(process.argv[2] || '3');
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));
 
 console.log(`🚀 强化版铸造脚本 - Quantity: ${quantity}`);

@@ -21,10 +21,10 @@ const ECPair = ECPairFactory(ecc);
 const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
-const SUBMIT_TIMEOUT = 500; // 500ms 超时
+const SUBMIT_TIMEOUT = 10000; // 10秒超时
 const PARALLEL_PER_SOLUTION = 10; // 每个解答发10次
 
-const quantity = parseInt(process.argv[2] || '4');
+const quantity = parseInt(process.argv[2] || '3');
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));
 
 console.log('🎯 双谜题预解答策略');

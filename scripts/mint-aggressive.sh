@@ -1,12 +1,12 @@
 #!/bin/bash
-# 激进策略：17:59:57 启动（提前 3 秒）
+# 激进策略：20:59:57 启动（提前 3 秒）
 # 风险：可能被拒绝（太早）
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/.."
 
-TARGET_TIME="17:59:57"  # 提前 3 秒
-QUANTITY=${1:-4}
+TARGET_TIME="20:59:57"  # 提前 3 秒
+QUANTITY=${1:-3}
 
 echo "⚡ 激进抢购模式"
 echo "========================"

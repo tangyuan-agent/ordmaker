@@ -16,7 +16,7 @@ const ECPair = ECPairFactory(ecc);
 const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
-const SUBMIT_TIMEOUT = 5000; // 5秒超时
+const SUBMIT_TIMEOUT = 10000; // 10秒超时
 const REQUESTS_PER_SOLUTION = 50; // 每个解答发50次
 const INTERVAL_MS = 10; // 每10ms发一次
 

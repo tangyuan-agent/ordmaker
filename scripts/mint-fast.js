@@ -24,11 +24,11 @@ const ECPair = ECPairFactory(ecc);
 const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
-const SUBMIT_TIMEOUT = 500; // 500ms 快速超时
+const SUBMIT_TIMEOUT = 10000; // 10秒超时
 const SUBMIT_RETRIES = 10; // 饱和式发送 10 次
 
 // 命令行参数
-const quantity = parseInt(process.argv[2] || '4');
+const quantity = parseInt(process.argv[2] || '3');
 const configFile = process.argv[3] || '../wallet.json';
 
 console.log(`🚀 高速抢购模式 - Quantity: ${quantity}`);

@@ -11,12 +11,12 @@ if [ ! -d "node_modules" ]; then
     echo ""
 fi
 
-# Get quantity from argument (default: 4)
-QUANTITY=${1:-4}
+# Get quantity from argument (default: 3)
+QUANTITY=${1:-3}
 
 # Validate quantity
-if [ "$QUANTITY" -lt 1 ] || [ "$QUANTITY" -gt 4 ]; then
-    echo "❌ Error: Quantity must be between 1 and 4"
+if [ "$QUANTITY" -lt 1 ] || [ "$QUANTITY" -gt 3 ]; then
+    echo "❌ Error: Quantity must be between 1 and 3"
     echo "Usage: $0 [quantity]"
     echo "Example: $0 1"
     exit 1

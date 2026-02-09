@@ -1,17 +1,17 @@
 #!/bin/bash
-# 定时抢购脚本 - 在 18:00:00 UTC 准时执行
+# 定时抢购脚本 - 在 21:00:00 UTC 准时执行
 # 使用方法: ./schedule-mint.sh
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/.."
 
-TARGET_TIME="17:59:59"  # 提前 1 秒启动
-QUANTITY=4
+TARGET_TIME="20:59:59"  # 提前 1 秒启动
+QUANTITY=3
 
 echo "⏰ WhoAmI Ordinals 定时抢购"
 echo "=============================="
 echo ""
-echo "目标时间: 2026-02-09 ${TARGET_TIME} UTC (提前 1 秒)"
+echo "目标时间: 2026-02-09 ${TARGET_TIME} UTC (Wave 2, 提前 1 秒)"
 echo "铸造数量: ${QUANTITY}"
 echo "当前时间: $(date -u +%H:%M:%S) UTC"
 echo ""
@@ -32,7 +32,7 @@ current_hour=$(date -u +%H)
 current_min=$(date -u +%M)
 current_sec=$(date -u +%S)
 
-target_hour=18
+target_hour=21
 target_min=0
 target_sec=0
 
