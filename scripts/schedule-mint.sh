@@ -5,13 +5,13 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/.."
 
-TARGET_TIME="18:00:00"
+TARGET_TIME="17:59:59"  # 提前 1 秒启动
 QUANTITY=4
 
 echo "⏰ WhoAmI Ordinals 定时抢购"
 echo "=============================="
 echo ""
-echo "目标时间: 2026-02-09 ${TARGET_TIME} UTC"
+echo "目标时间: 2026-02-09 ${TARGET_TIME} UTC (提前 1 秒)"
 echo "铸造数量: ${QUANTITY}"
 echo "当前时间: $(date -u +%H:%M:%S) UTC"
 echo ""
@@ -95,8 +95,8 @@ echo ""
 echo "🚀 启动铸造！"
 echo ""
 
-# 执行高速脚本
-node scripts/mint-fast.js ${QUANTITY}
+# 执行强化版脚本（带超时和重试）
+node scripts/mint-robust.js ${QUANTITY}
 
 exit_code=$?
 
@@ -107,5 +107,5 @@ else
     echo "❌ 铸造失败"
     echo ""
     echo "🔄 尝试备用方案（quantity=1）..."
-    node scripts/mint-fast.js 1
+    node scripts/mint-robust.js 1
 fi
