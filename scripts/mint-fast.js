@@ -24,6 +24,8 @@ const ECPair = ECPairFactory(ecc);
 const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
+const SUBMIT_TIMEOUT = 500; // 500ms 快速超时
+const SUBMIT_RETRIES = 10; // 饱和式发送 10 次
 
 // 命令行参数
 const quantity = parseInt(process.argv[2] || '4');
@@ -64,22 +66,35 @@ function solveFast(challenge, address) {
   }
 }
 
-// 快速API调用（最小化开销）
-async function apiCall(endpoint, body) {
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'User-Agent': USER_AGENT,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
+// 快速API调用（支持自定义超时）
+async function apiCall(endpoint, body, timeout = 5000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
   
-  const data = await response.json();
-  if (!response.ok && !data.challenge_required && !data.success) {
-    throw new Error(data.error || `HTTP ${response.status}`);
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'User-Agent': USER_AGENT,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    
+    const data = await response.json();
+    if (!response.ok && !data.challenge_required && !data.success) {
+      throw new Error(data.error || `HTTP ${response.status}`);
+    }
+    return data;
+  } catch (error) {
+    clearTimeout(id);
+    if (error.name === 'AbortError') {
+      throw new Error('Timeout');
+    }
+    throw error;
   }
-  return data;
 }
 
 // 快速签名（最小化日志）
@@ -122,10 +137,28 @@ async function mint() {
     console.log('2️⃣ 求解中...');
     const nonce = solveFast(challenge.challenge, walletConfig.payment_address);
     
-    // Step 3: 提交（立即）
-    console.log('3️⃣ 提交...');
+    // Step 3: 饱和式提交（并行 10 个请求）
+    console.log('3️⃣ 📨 饱和式提交 (并行 10 请求)...');
     payload.challenge_nonce = nonce;
-    const mint = await apiCall(`/agent/collections/${COLLECTION_ID}/mint`, payload);
+    
+    // 并行发送 10 个请求
+    const requests = [];
+    for (let i = 1; i <= SUBMIT_RETRIES; i++) {
+      requests.push(
+        apiCall(`/agent/collections/${COLLECTION_ID}/mint`, payload, SUBMIT_TIMEOUT)
+          .catch(err => null)
+      );
+    }
+    
+    // 等待所有请求完成，取第一个成功的
+    const results = await Promise.all(requests);
+    const mint = results.find(r => r && r.commit_psbt);
+    
+    if (!mint) {
+      throw new Error('所有请求都失败了');
+    }
+    
+    console.log('   ✅ 成功！');
     
     if (!mint.commit_psbt) {
       throw new Error('未收到 PSBT: ' + JSON.stringify(mint));

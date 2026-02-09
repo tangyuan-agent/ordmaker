@@ -15,7 +15,7 @@ const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const quantity = parseInt(args.find(a => a.startsWith('--quantity='))?.split('=')[1] || '1');
+const quantity = parseInt(args.find(a => a.startsWith('--quantity='))?.split('=')[1] || '4');
 const feeRate = args.find(a => a.startsWith('--fee-rate='))?.split('=')[1];
 const configFile = args.find(a => a.startsWith('--config='))?.split('=')[1] || '../wallet.json';
 

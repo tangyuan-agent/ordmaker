@@ -16,7 +16,8 @@ const ECPair = ECPairFactory(ecc);
 const COLLECTION_ID = '812eed4e-c7bb-436a-b4d3-a43342c6ef37';
 const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
-const REQUEST_TIMEOUT = 5000; // 5 秒超时
+const REQUEST_TIMEOUT = 500; // 500ms 快速失败
+const SUBMIT_RETRIES = 10; // 饱和式发送 10 次
 
 const quantity = parseInt(process.argv[2] || '4');
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));
@@ -145,13 +146,30 @@ async function mint() {
     console.log('2️⃣ 求解 PoW...');
     const nonce = solvePow(challenge.challenge, walletConfig.payment_address);
     
-    // Step 3: 提交答案（带重试，这是最关键的）
-    console.log('3️⃣ 提交答案...');
+    // Step 3: 提交答案（并行 10 个请求）
+    console.log('3️⃣ 📨 提交答案 (并行 10 请求)...');
     payload.challenge_nonce = nonce;
     
     let mint;
     try {
-      mint = await apiCall(`/agent/collections/${COLLECTION_ID}/mint`, payload, 2);
+      // 并行发送 10 个请求
+      const requests = [];
+      for (let i = 1; i <= SUBMIT_RETRIES; i++) {
+        requests.push(
+          apiCall(`/agent/collections/${COLLECTION_ID}/mint`, payload, 0)
+            .catch(err => null)
+        );
+      }
+      
+      // 等待所有请求完成，取第一个成功的
+      const results = await Promise.all(requests);
+      mint = results.find(r => r && r.commit_psbt);
+      
+      if (!mint) {
+        throw new Error('所有请求都失败了');
+      }
+      
+      console.log('   ✅ 成功！');
     } catch (error) {
       // 如果是 "already minted" 错误，说明其实成功了
       if (error.message.includes('already') || error.message.includes('duplicate')) {

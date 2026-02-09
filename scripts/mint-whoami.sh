@@ -2,7 +2,7 @@
 # WhoAmI Ordinals Minting Wrapper Script
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd "$SCRIPT_DIR"
+cd "$SCRIPT_DIR/.."
 
 # Check if npm dependencies are installed
 if [ ! -d "node_modules" ]; then
@@ -11,8 +11,8 @@ if [ ! -d "node_modules" ]; then
     echo ""
 fi
 
-# Get quantity from argument (default: 1)
-QUANTITY=${1:-1}
+# Get quantity from argument (default: 4)
+QUANTITY=${1:-4}
 
 # Validate quantity
 if [ "$QUANTITY" -lt 1 ] || [ "$QUANTITY" -gt 4 ]; then
@@ -41,4 +41,4 @@ EOF
 fi
 
 # Run minting script
-node mint.js --quantity="$QUANTITY"
+node scripts/mint.js --quantity="$QUANTITY"
