@@ -1,0 +1,6 @@
+{
+  "payment_address": "bc1p...your_payment_address_here",
+  "payment_pubkey": "02abc123...your_payment_pubkey_hex_here",
+  "receiving_address": "bc1p...where_inscriptions_should_go",
+  "private_key_wif": "L...your_private_key_in_WIF_format"
+}

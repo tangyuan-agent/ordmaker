@@ -1,0 +1,21 @@
+# 🔐 敏感信息 - 绝对不要提交！
+wallet.json
+*.wif
+*.key
+*_private*
+*secret*
+
+# 📦 Node.js
+node_modules/
+package-lock.json
+
+# 🗑️ 临时文件
+*.log
+*.tmp
+.DS_Store
+.env
+.env.local
+
+# 🧪 测试输出
+test-output/
+*.test.json
