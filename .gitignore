@@ -18,3 +18,4 @@ node_modules/
 # 🧪 测试输出
 test-output/
 *.test.json
+whoami-solutions.json

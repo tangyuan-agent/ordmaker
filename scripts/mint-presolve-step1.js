@@ -13,7 +13,7 @@ const API_BASE = 'https://ordmaker.fun/api';
 const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
 
 const quantity = parseInt(process.argv[2] || '4');
-const solutionsFile = process.argv[3] || '/tmp/whoami-solutions.json';
+const solutionsFile = process.argv[3] || path.resolve(__dirname, '../whoami-solutions.json');
 const label = process.argv[4] || 'Solution';
 
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));

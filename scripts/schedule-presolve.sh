@@ -10,7 +10,7 @@ cd "$SCRIPT_DIR/.."
 QUANTITY=${1:-4}
 SOLVE_SCRIPT="$SCRIPT_DIR/solve-challenge.js"
 SUBMIT_SCRIPT="$SCRIPT_DIR/submit-presolve.js"
-SOLUTIONS_FILE="/tmp/whoami-solutions-$$.json"
+SOLUTIONS_FILE="$SCRIPT_DIR/../whoami-solutions.json"
 
 echo "🎯 双谜题预解答策略"
 echo "=========================="

@@ -19,7 +19,7 @@ const USER_AGENT = 'TangyuanAgent/1.0 (AI Agent)';
 const SUBMIT_TIMEOUT = 500; // 500ms
 const PARALLEL_PER_SOLUTION = 10; // 每个解答发10次
 
-const solutionsFile = process.argv[2] || '/tmp/whoami-solutions.json';
+const solutionsFile = process.argv[2] || path.resolve(__dirname, '../whoami-solutions.json');
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));
 
 // API 调用
