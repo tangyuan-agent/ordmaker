@@ -22,8 +22,9 @@ const PARALLEL_PER_SOLUTION = 10; // 每个解答发10次
 const solutionsFile = process.argv[2] || path.resolve(__dirname, '../whoami-solutions.json');
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));
 
-// API 调用
+// API 调用（带计时）
 async function apiCall(endpoint, body, timeout = 5000) {
+  const startTime = Date.now();
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   
@@ -46,10 +47,11 @@ async function apiCall(endpoint, body, timeout = 5000) {
     return data;
   } catch (error) {
     clearTimeout(id);
+    const elapsed = Date.now() - startTime;
     if (error.name === 'AbortError') {
-      throw new Error('Timeout');
+      throw new Error(`Timeout (${elapsed}ms)`);
     }
-    throw error;
+    throw new Error(`${error.message} (${elapsed}ms)`);
   }
 }
 
@@ -103,8 +105,8 @@ async function saturatedSubmit(solutions) {
   
   if (successes.length === 0) {
     console.error('');
-    console.error('失败详情:');
-    errors.slice(0, 5).forEach(e => {
+    console.error('失败详情（全部）:');
+    errors.forEach(e => {
       console.error(`  - [${e.solution}#${e.attempt}] ${e.error}`);
     });
     throw new Error('所有请求都失败了');

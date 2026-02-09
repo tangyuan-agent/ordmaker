@@ -18,8 +18,9 @@ const label = process.argv[4] || 'Solution';
 
 const walletConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../wallet.json'), 'utf8'));
 
-// API 调用
+// API 调用（带计时）
 async function apiCall(endpoint, body, timeout = 5000) {
+  const startTime = Date.now();
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   
@@ -42,10 +43,11 @@ async function apiCall(endpoint, body, timeout = 5000) {
     return data;
   } catch (error) {
     clearTimeout(id);
+    const elapsed = Date.now() - startTime;
     if (error.name === 'AbortError') {
-      throw new Error('Timeout');
+      throw new Error(`Timeout (${elapsed}ms)`);
     }
-    throw error;
+    throw new Error(`${error.message} (${elapsed}ms)`);
   }
 }
 
